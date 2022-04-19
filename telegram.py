@@ -11,6 +11,8 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import tokenid 
+
 
 options = webdriver.ChromeOptions()
 # 백그라운드로 실행
@@ -87,10 +89,9 @@ def movie_chart_crawling():
     #return output 
 
 
+id = tokenid.id
+token = tokenid.token
 
-
-token = '5221097095:AAGJaWVAU0i0eWf7FHI7ioGRzgB9pHlVdqs'
-id = '5160184450'
 
 bot = telegram.Bot(token)
 info_message = '''- 오늘 확진자 수 확인 : "코로나" 입력
