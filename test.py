@@ -129,7 +129,41 @@ def movie_chart_crawling():
     #         break
     #return output
     
+def melon_chart_crawling():
+    url = 'https://www.melon.com/chart/index.htm'
+ 
+    browser.get(url)
+    melon = browser.page_source
+    soup = BeautifulSoup(melon, 'html.parser')
+    # title = soup.select('#frm > div div.ellipsis.rank01 > span > a')
+    title = soup.find_all('div',attrs={'class':'ellipsis.rank01'})
+    # artist = soup.select('#frm > div div.ellipsis.rank02 > span')
+    artist = soup.find_all('div',attrs={'class':'ellipsis.rank01'})
+ 
+    titles = []
+    for i,j in enumerate(title):
+        if i < 10:
+            tts = str(i) + ' ' + j.get_text()
+            titles.append(tts)
+ 
+    artists = []
+    for i, j in enumerate(artist):
+        if i < 10:
+            tts = j.get_text()
+            artists.append(tts)
+ 
+    key_val = [titles, artists]
+    # rank_text = dict(zip(*key_val))
+    print(artist)
+    #titles, artists 는 .text필드 없음, str로 파싱 후 title은 앞자리2번째부터
+    output=" "
+    #10개. 더 구하고싶으면 더 조절
+    # for i in range (0,10):
+        
+    #     output+=str(i+1)+'위: '+str(titles[i][2:])+"-"+str(artists[i])+'\n'
 
+    # print(output)     
+    return output
     
 options = webdriver.ChromeOptions()
 # 백그라운드로 실행
@@ -142,4 +176,5 @@ browser = webdriver.Chrome(options=options)
 if __name__ == '__main__':    
     # covid_image_crawling()
     # movie_chart_crawling()
-    covid_news_crawling()
+    # covid_news_crawling()
+    melon_chart_crawling()

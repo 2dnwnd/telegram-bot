@@ -88,6 +88,34 @@ def movie_chart_crawling():
             break
     #return output 
 
+def melon_chart_crawling():
+    url = 'https://www.melon.com/chart/index.htm'
+    soup = create_soup(url)
+    title = soup.select('#frm > div div.ellipsis.rank01 > span > a')
+    artist = soup.select('#frm > div div.ellipsis.rank02 > span')
+ 
+    titles = []
+    for index,song in enumerate(title):
+        if index < 10:
+            tts = str(index) + ' ' + song.get_text()
+            titles.append(tts)
+ 
+    artists = []
+    for index, song in enumerate(artist):
+        if index < 10:
+            tts = song.get_text()
+            artists.append(tts)
+    
+    # titles, artists 는 .text필드 없음, str로 파싱 후 title은 앞자리2번째부터
+    output=" "
+    # 10위까지 
+    for i in range (0,10):
+        # 0,1 없애기
+        output+=str(i+1)+'위: '+str(titles[i][2:])+"-"+str(artists[i])+'\n'
+            
+    return output
+    
+
 
 id = tokenid.id
 token = tokenid.token
@@ -97,7 +125,8 @@ bot = telegram.Bot(token)
 info_message = '''- 오늘 확진자 수 확인 : "코로나" 입력
 - 코로나 관련 뉴스 : "뉴스" 입력
 - 코로나 관련 이미지 : "이미지" 입력
-- 최신 영화 순위 : "영화" 입력  '''
+- 최신 영화 순위 : "영화" 입력 
+- 최신 노래 순위 : "멜론" 입력 '''
 bot.sendMessage(chat_id=id, text=info_message)
 
 # updater
@@ -139,6 +168,12 @@ def handler(update, context):
         #bot.send_message(chat_id=id,text=movie_chart)
         bot.sendMessage(chat_id=id,text=info_message)
 
+    elif( user_text=="멜론"):
+        bot.send_message(chat_id=id, text="조회 중 입니다...")
+        melon_chart=melon_chart_crawling()
+        bot.send_message(chat_id=id, text=melon_chart)
+        bot.sendMessage(chat_id=id, text=info_message)
+        
     
 
 echo_handler = MessageHandler(Filters.text, handler)
