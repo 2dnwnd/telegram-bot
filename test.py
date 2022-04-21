@@ -164,7 +164,31 @@ def melon_chart_crawling():
 
     # print(output)     
     return output
-    
+
+def weather_crawling():
+    url="https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=%EC%8B%9C%ED%9D%A5+%EB%82%A0%EC%94%A8&oquery=%EB%82%A0%EC%94%A8&tqi=hP%2FGYdprvN8ssFZzsmGssssssM0-366507"
+    soup = create_soup(url)
+
+    cast = soup.find('p', attrs={'class':'summary'}).get_text()
+
+    curr_temp = soup.find('div',attrs={'class':'temperature_text'}).get_text().strip()
+    min_temp = soup.find('span',attrs={'class':'lowest'}).get_text()
+    max_temp = soup.find('span',attrs={'class':'highest'}).get_text()
+
+    morning_rain_rate = soup.find('span',attrs={'class':'rainfall'}).get_text()
+    evening_rain_rate = soup.find('span',attrs={'class':'rainfall'}).get_text()
+
+    pm10 = soup.find('li',attrs={'class':'item_today level1'}).get_text().strip()
+    pm25 = soup.find('li',attrs={'class':'item_today level3'}).get_text().strip()
+
+    print(cast)
+    print('{} ({}/ {})'.format(curr_temp,min_temp,max_temp))
+    print('오전강수 확률 {} / 오후강수 확률 {}'.format(morning_rain_rate,evening_rain_rate))
+    print('{}, {}'.format(pm10, pm25))
+    print()
+
+
+
 options = webdriver.ChromeOptions()
 # 백그라운드로 실행
 # options.add_argument('headless')
@@ -177,4 +201,5 @@ if __name__ == '__main__':
     # covid_image_crawling()
     # movie_chart_crawling()
     # covid_news_crawling()
-    melon_chart_crawling()
+    # melon_chart_crawling()
+    weather_crawling()
