@@ -53,10 +53,10 @@ def covid_image_crawling(image_num=5):
         os.mkdir("./코로나이미지")
  
     browser.implicitly_wait(3)
-    wait = WebDriverWait(browser, 10)
+    # wait = WebDriverWait(browser, 10)
     browser.get("https://search.naver.com/search.naver?where=image&section=image&query=%EC%BD%94%EB%A1%9C%EB%82%98&res_fr=0&res_to=0&sm=tab_opt&color=&ccl=0&nso=so%3Ar%2Cp%3A1d%2Ca%3Aall&datetype=1&startdate=&enddate=&gif=0&optStr=d&nq=&dq=&rq=&tq=")
  
-    wait.until(EC.presence_of_element_located(By.XPATH, '//img[@class="_image _listImage"]'))
+    # wait.until(EC.presence_of_element_located(By.XPATH, '//img[@class="_image _listImage"]'))
     images = browser.find_elements(By.XPATH, '//img[@class="_image _listImage"]')
 
     for image in images:
