@@ -4,3 +4,4 @@ start.py
 tokenid.py
 
 *.png
+chromedriver.exe
