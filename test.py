@@ -187,6 +187,52 @@ def weather_crawling():
     print('{}, {}'.format(pm10, pm25))
     print()
 
+def sports_news_crawling():
+    url = 'https://sports.news.naver.com'
+    browser.get('https://sports.news.naver.com/wfootball/index')
+    browser.find_element_by_xpath('//*[@id="_sports_lnb_menu"]/div/ul[1]/li[5]/ul/li[1]/a').click()
+    browser.implicitly_wait(3)
+    browser.find_element_by_xpath('//*[@id="_sortTypeList"]/li[2]').click()
+    time.sleep(3)
+
+    soup = BeautifulSoup(browser.page_source,'lxml')
+
+    result = ''
+    news_list = soup.find('div',attrs={'class':'news_list'}).find('ul').find_all('li',limit=5)
+    for news in news_list:
+        a_idx = 0
+        img = news.find('img')
+        if img:
+            a_idx = 1
+
+        title = news.find_all('a')[a_idx].get_text()
+        link = url+news.find_all('a')[a_idx]['href']
+        result += title + "\n" + link + "\n\n"
+        # print(title)
+        # print(link)
+    return result
+
+def sports_video_crawling():
+    browser.get('https://sports.news.naver.com/wfootball/index')
+    browser.find_element_by_xpath('//*[@id="_sports_lnb_menu"]/div/ul[1]/li[5]/ul/li[2]/a').click()
+    browser.find_element_by_xpath('//*[@id="daily_ranking"]/li[1]/a').click()
+
+    soup = BeautifulSoup(browser.page_source,'lxml')
+    
+    result =''
+    title = soup.find('div',attrs={'class':'video_summary'}).find('h3').get_text()
+    link = browser.current_url
+    print(title)
+    print(link)
+    # result = title + link
+    # video_list = soup.find('ul',attrs={'id':'daily_ranking'}).find_all('li',limit=3)
+    # for news in video_list:
+        # title = news.find_all('a').get_text()
+        # link = url+news.find_all('a')[a_idx]['href']
+        # result += title + "\n" + link + "\n\n"
+        # print(title)
+        # print(link)
+    # return result
 
 
 options = webdriver.ChromeOptions()
@@ -202,4 +248,6 @@ if __name__ == '__main__':
     # movie_chart_crawling()
     # covid_news_crawling()
     # melon_chart_crawling()
-    weather_crawling()
+    # weather_crawling()
+    # sports_news_crawling()
+    sports_video_crawling()

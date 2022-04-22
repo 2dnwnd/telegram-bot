@@ -131,15 +131,62 @@ def weather_crawling():
     # wind = soup.find('di',attrs={'class':'summary_list'}).get_text()
 
     pm10 = soup.find('li',attrs={'class':'item_today level1'}).get_text().strip()
-    pm25 = soup.find('li',attrs={'class':'item_today level2'}).get_text().strip()
-    uv = soup.find('li',attrs={'class':'item_today level3'}).get_text().strip()
+    pm25 = soup.find('li',attrs={'class':'item_today level3'}).get_text().strip()
+    # uv = soup.find('li',attrs={'class':'item_today level1'}).get_text().strip()
 
      
     result = (cast+'\n'+'{} ({}/ {})'.format(curr_temp,min_temp,max_temp)
     +'\n'+'오전강수 확률 {} / 오후강수 확률 {}'.format(morning_rain_rate,evening_rain_rate)
     # +'\n'+'{}'.format(wind[4]+wind[5])
-    +'\n'+'{}, {}, {}'.format(pm10, pm25, uv))
+    +'\n'+'{}, {}'.format(pm10, pm25))
     
+    return result
+
+def sports_news_crawling():
+    url = 'https://sports.news.naver.com'
+    browser.get('https://sports.news.naver.com/wfootball/index')
+    browser.find_element_by_xpath('//*[@id="_sports_lnb_menu"]/div/ul[1]/li[5]/ul/li[1]/a').click()
+    browser.implicitly_wait(3)
+    browser.find_element_by_xpath('//*[@id="_sortTypeList"]/li[2]').click()
+    time.sleep(3)
+
+    soup = BeautifulSoup(browser.page_source,'lxml')
+
+    result = ''
+    news_list = soup.find('div',attrs={'class':'news_list'}).find('ul').find_all('li',limit=3)
+    for news in news_list:
+        a_idx = 0
+        img = news.find('img')
+        if img:
+            a_idx = 1
+
+        title = news.find_all('a')[a_idx].get_text()
+        link = url+news.find_all('a')[a_idx]['href']
+        result += title + "\n" + link + "\n\n"
+        # print(title)
+        # print(link)
+    return result
+
+def sports_video_crawling():
+    browser.get('https://sports.news.naver.com/wfootball/index')
+    browser.find_element_by_xpath('//*[@id="_sports_lnb_menu"]/div/ul[1]/li[5]/ul/li[2]/a').click()
+    browser.find_element_by_xpath('//*[@id="daily_ranking"]/li[1]/a').click()
+
+    soup = BeautifulSoup(browser.page_source,'lxml')
+    
+    result =''
+    title = soup.find('div',attrs={'class':'video_summary'}).find('h3').get_text()
+    link = browser.current_url
+    # print(title)
+    # print(url)
+    result = title + '\n' + link
+    # video_list = soup.find('ul',attrs={'id':'daily_ranking'}).find_all('li',limit=3)
+    # for news in video_list:
+        # title = news.find_all('a').get_text()
+        # link = url+news.find_all('a')[a_idx]['href']
+        # result += title + "\n" + link + "\n\n"
+        # print(title)
+        # print(link)
     return result
 
 
@@ -154,7 +201,9 @@ info_message = '''- 오늘 확진자 수 확인 : "코로나" 입력
 - 코로나 관련 이미지 : "이미지" 입력
 - 최신 영화 순위 : "영화" 입력 
 - 최신 노래 순위 : "멜론" 입력
-- 현재 날씨 : "날씨" 입력  '''
+- 현재 날씨 : "날씨" 입력 
+- 최신 인기 축구뉴스 :  "축구" 
+- 인기 축구영상 : 축구영상  '''
 bot.sendMessage(chat_id=id, text=info_message)
 
 # updater
@@ -208,6 +257,16 @@ def handler(update, context):
         bot.send_message(chat_id=id,text=n_weather)
         bot.sendMessage(chat_id=id,text=info_message)    
     
+    elif(user_text=="축구"):
+        sports_news = sports_news_crawling()
+        bot.send_message(chat_id=id,text=sports_news) 
+        bot.sendMessage(chat_id=id,text=info_message)
+
+    elif(user_text=='축구영상'):
+        sport_video = sports_video_crawling()
+        bot.send_message(chat_id=id,text=sport_video)
+        bot.sendMessage(chat_id=id,text=info_message)
+
 
 echo_handler = MessageHandler(Filters.text, handler)
 dispatcher.add_handler(echo_handler)
