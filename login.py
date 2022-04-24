@@ -1,7 +1,8 @@
 from selenium import webdriver
+import tokenid
 
-user_id = 'dnwnd1019'
-user_pw = 'aa1216137'
+id = tokenid.user_id
+pw = tokenid.user_pw
 
 browser = webdriver.Chrome()
 browser.get('https://www.naver.com/')
