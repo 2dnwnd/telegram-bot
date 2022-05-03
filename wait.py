@@ -50,3 +50,5 @@ while True:
 
 # 맨위로 올리기
 driver.execute_script('window.scrollTo(0,0)')
+
+# 웹페이지 끝까지 로딩 후 웹스크래핑

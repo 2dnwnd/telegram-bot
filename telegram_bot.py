@@ -22,6 +22,7 @@ options.add_argument('window-size=1920x1080')
 
 browser = webdriver.Chrome(options=options)
 
+
 def create_soup(url):
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36'}
     res = requests.get(url,headers=headers)
@@ -29,6 +30,7 @@ def create_soup(url):
     soup = BeautifulSoup(res.text,'lxml')
     return soup
 
+# 코로나 확진자수
 def covid_num_crawling():
     url = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=%ED%99%95%EC%A7%84%EC%9E%90'
     soup = create_soup(url)
@@ -36,6 +38,7 @@ def covid_num_crawling():
     result = soup.find('p', attrs={'class':'info_num'}).get_text()
     return result
 
+# 코로나 뉴스 확인
 def covid_news_crawling():
 
     url = 'https://search.naver.com/search.naver?where=news&sm=tab_jum&query=%EC%BD%94%EB%A1%9C%EB%82%98'
@@ -48,6 +51,7 @@ def covid_news_crawling():
         output_result += title + "\n" + news_url + "\n\n"
     return output_result
 
+# 코로나 이미지
 def covid_image_crawling(image_num=5):
     if not os.path.exists("./코로나이미지"):
         os.mkdir("./코로나이미지")
@@ -66,6 +70,7 @@ def covid_image_crawling(image_num=5):
             break
     browser.close()
 
+# 최신 영화 순위
 def movie_chart_crawling():
     session=requests.Session()
     #영화 크롤링 사이트
@@ -76,7 +81,7 @@ def movie_chart_crawling():
     cnt=1
     output=" "
  
-    # 영화제목+ 링크가 순서대로 5개 출력되고 각 영화별 설명이 짤막하게 들어가고 + 출력까지 
+    # 영화제목 + 영화링크 + 영화설명
     for title in titles:
         output+=str(cnt)+'위: '+title.find('a').text+'\n'+addr+title.find('a')['href']+'\n'
         print(output)
@@ -88,6 +93,7 @@ def movie_chart_crawling():
             break
     #return output 
 
+# 멜론차트 10위
 def melon_chart_crawling():
     url = 'https://www.melon.com/chart/index.htm'
     soup = create_soup(url)
@@ -115,6 +121,7 @@ def melon_chart_crawling():
             
     return output
     
+# 날씨 정보
 def weather_crawling():
     url="https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=%EC%8B%9C%ED%9D%A5+%EB%82%A0%EC%94%A8&oquery=%EB%82%A0%EC%94%A8&tqi=hP%2FGYdprvN8ssFZzsmGssssssM0-366507"
     soup = create_soup(url)
@@ -130,18 +137,19 @@ def weather_crawling():
 
     # wind = soup.find('di',attrs={'class':'summary_list'}).get_text()
 
-    pm10 = soup.find('li',attrs={'class':'item_today level1'}).get_text().strip()
-    pm25 = soup.find('li',attrs={'class':'item_today level3'}).get_text().strip()
-    # uv = soup.find('li',attrs={'class':'item_today level1'}).get_text().strip()
+    pm10 = soup.find('li',attrs={'class':'item_today level2'}).get_text().strip()
+    pm25 = soup.find('li',attrs={'class':'item_today level2'}).get_text().strip()
+    uv = soup.find('li',attrs={'class':'item_today level1'}).get_text().strip()
 
      
     result = (cast+'\n'+'{} ({}/ {})'.format(curr_temp,min_temp,max_temp)
     +'\n'+'오전강수 확률 {} / 오후강수 확률 {}'.format(morning_rain_rate,evening_rain_rate)
     # +'\n'+'{}'.format(wind[4]+wind[5])
-    +'\n'+'{}, {}'.format(pm10, pm25))
+    +'\n'+'{}, {}, {}'.format(pm10, pm25, uv))
     
     return result
 
+# 최신 인기 축구뉴스
 def sports_news_crawling():
     url = 'https://sports.news.naver.com'
     browser.get('https://sports.news.naver.com/wfootball/index')
@@ -167,6 +175,7 @@ def sports_news_crawling():
         # print(link)
     return result
 
+# 인기 축구영상
 def sports_video_crawling():
     browser.get('https://sports.news.naver.com/wfootball/index')
     browser.find_element_by_xpath('//*[@id="_sports_lnb_menu"]/div/ul[1]/li[5]/ul/li[2]/a').click()
@@ -176,6 +185,7 @@ def sports_video_crawling():
     
     result =''
     title = soup.find('div',attrs={'class':'video_summary'}).find('h3').get_text()
+    # 현재 페이지링크를 저장
     link = browser.current_url
     # print(title)
     # print(url)
@@ -200,10 +210,10 @@ info_message = '''- 오늘 확진자 수 확인 : "코로나" 입력
 - 코로나 관련 뉴스 : "뉴스" 입력
 - 코로나 관련 이미지 : "이미지" 입력
 - 최신 영화 순위 : "영화" 입력 
-- 최신 노래 순위 : "멜론" 입력
+- 최신 노래 순위 : "노래" 입력
 - 현재 날씨 : "날씨" 입력 
-- 최신 인기 축구뉴스 :  "축구" 
-- 인기 축구영상 : 축구영상  '''
+- 최신 인기 축구뉴스 :  "축구" 입력
+- 인기 축구영상 : "축구영상" 입력  '''
 bot.sendMessage(chat_id=id, text=info_message)
 
 # updater
@@ -219,12 +229,12 @@ def handler(update, context):
     if (user_text == '코로나'):
         covid_num = covid_num_crawling()
         bot.send_message(chat_id=id, text='오늘 확진자 수: {}명'.format(covid_num))
-        bot.sendMessage(chat_id=id, text=info_message)
+        # bot.sendMessage(chat_id=id, text=info_message)
     # 코로나 관련 뉴스 답장
     elif (user_text == "뉴스"):
         covid_news = covid_news_crawling()
         bot.send_message(chat_id=id, text=covid_news)
-        bot.sendMessage(chat_id=id, text=info_message)
+        # bot.sendMessage(chat_id=id, text=info_message)
     # 코로나 관련 이미지 답장
     elif (user_text == "이미지"):
         bot.send_message(chat_id=id, text="최신 이미지 크롤링 중...")
@@ -236,36 +246,39 @@ def handler(update, context):
         for i in range(len(os.walk("./코로나이미지").__next__()[2])): 
             photo_list.append(telegram.InputMediaPhoto(open("./코로나이미지/{}.png".format(i), "rb")))
         bot.sendMediaGroup(chat_id=id, media=photo_list)
-        bot.sendMessage(chat_id=id, text=info_message)
-
+        # bot.sendMessage(chat_id=id, text=info_message)
+    # 최신인기 영화 순위 정보 답장
     elif(user_text=="영화"):
         bot.send_message(chat_id=id, text="조회 중 입니다...")
         movie_chart=movie_chart_crawling()
-        #출력은 위의 함수 내부에서 한다.
+        #출력은 위의 함수 내부에서 한다. (1개씩 보내는걸 5번한거)
         #bot.send_message(chat_id=id,text=movie_chart)
-        bot.sendMessage(chat_id=id,text=info_message)
-
-    elif( user_text=="멜론"):
+        # bot.sendMessage(chat_id=id,text=info_message)
+    # 멜론차트 정보 답장
+    elif( user_text=="노래"):
         bot.send_message(chat_id=id, text="조회 중 입니다...")
         melon_chart=melon_chart_crawling()
         bot.send_message(chat_id=id, text=melon_chart)
         bot.sendMessage(chat_id=id, text=info_message)
-        
+    # 현재 날씨 답장    
     elif(user_text=="날씨"):
+        bot.send_message(chat_id=id, text="조회 중 입니다...")
         #n: neighbor
         n_weather=weather_crawling()
         bot.send_message(chat_id=id,text=n_weather)
-        bot.sendMessage(chat_id=id,text=info_message)    
-    
+        # bot.sendMessage(chat_id=id,text=info_message)    
+    # 축구 관련 뉴스 답장
     elif(user_text=="축구"):
+        bot.send_message(chat_id=id, text="조회 중 입니다...")
         sports_news = sports_news_crawling()
         bot.send_message(chat_id=id,text=sports_news) 
-        bot.sendMessage(chat_id=id,text=info_message)
-
+        # bot.sendMessage(chat_id=id,text=info_message)
+    # 축구 관련 영상 답장
     elif(user_text=='축구영상'):
+        bot.send_message(chat_id=id, text="조회 중 입니다...")
         sport_video = sports_video_crawling()
         bot.send_message(chat_id=id,text=sport_video)
-        bot.sendMessage(chat_id=id,text=info_message)
+        # bot.sendMessage(chat_id=id,text=info_message)
 
 
 echo_handler = MessageHandler(Filters.text, handler)
